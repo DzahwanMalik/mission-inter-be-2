@@ -49,7 +49,7 @@ const createMovie = async (req, res) => {
   } = req.body;
 
   try {
-    const movie = await db("movies").insert({
+    const [movie] = await db("movies").insert({
       title,
       description,
       rating,
@@ -64,8 +64,10 @@ const createMovie = async (req, res) => {
       runtime,
     });
 
+    const updatedMovies = await db.select().from("movies").where("id", movie);
+
     res.json({
-      result: movie,
+      result: updatedMovies,
       message: "Create movie successfully",
     });
   } catch (err) {
@@ -93,7 +95,7 @@ const updateMovie = async (req, res) => {
   } = req.body;
 
   try {
-    const movie = await db
+    await db
       .update({
         title,
         description,
@@ -111,8 +113,10 @@ const updateMovie = async (req, res) => {
       .from("movies")
       .where("id", id);
 
+    const updatedMovies = await db.select().from("movies").where("id", id);
+
     res.json({
-      result: movie,
+      result: updatedMovies,
       message: "Update movie successfully",
     });
   } catch (err) {
@@ -129,7 +133,6 @@ const deleteMovie = async (req, res) => {
     const movie = await db.delete().from("movies").where("id", id);
 
     res.json({
-      result: movie,
       message: "Delete movie successfully",
     });
   } catch (err) {
