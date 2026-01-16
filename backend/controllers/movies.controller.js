@@ -49,22 +49,20 @@ const createMovie = async (req, res) => {
   } = req.body;
 
   try {
-    const movie = await db
-      .insert({
-        title,
-        description,
-        rating,
-        release_date,
-        popularity,
-        age_rating,
-        poster_url,
-        poster_public_id,
-        backdrop_url,
-        backdrop_public_id,
-        trailer_key,
-        runtime,
-      })
-      .into("movies");
+    const movie = await db("movies").insert({
+      title,
+      description,
+      rating,
+      release_date,
+      popularity,
+      age_rating,
+      poster_url,
+      poster_public_id,
+      backdrop_url,
+      backdrop_public_id,
+      trailer_key,
+      runtime,
+    });
 
     res.json({
       result: movie,
