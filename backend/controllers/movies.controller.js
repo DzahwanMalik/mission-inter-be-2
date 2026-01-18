@@ -1,4 +1,5 @@
 import { db } from "../config/database.js";
+import fs from "fs";
 
 const getMovies = async (req, res) => {
   const { search, popular, newRelease } = req.query;
@@ -58,13 +59,11 @@ const createMovie = async (req, res) => {
     release_date,
     popularity,
     age_rating,
-    poster_url,
-    poster_public_id,
-    backdrop_url,
-    backdrop_public_id,
     trailer_key,
     runtime,
   } = req.body;
+
+  const poster_image = req.file.path.replace("\\", "/");
 
   try {
     const [movie] = await db("movies").insert({
@@ -74,10 +73,7 @@ const createMovie = async (req, res) => {
       release_date,
       popularity,
       age_rating,
-      poster_url,
-      poster_public_id,
-      backdrop_url,
-      backdrop_public_id,
+      poster_image,
       trailer_key,
       runtime,
     });
@@ -104,15 +100,27 @@ const updateMovie = async (req, res) => {
     release_date,
     popularity,
     age_rating,
-    poster_url,
-    poster_public_id,
-    backdrop_url,
-    backdrop_public_id,
     trailer_key,
     runtime,
   } = req.body;
 
   try {
+    const movie = await db.select().from("movies").where("id", id).first();
+
+    if (!movie) {
+      const error = new Error("Movie not found");
+      error.status = 404;
+      throw error;
+    }
+
+    let posterImage = await movie.poster_image;
+
+    if (req.file) {
+      posterImage = req.file.path.replace("\\", "/");
+
+      fs.unlinkSync(movie.poster_image);
+    }
+
     await db
       .update({
         title,
@@ -121,10 +129,7 @@ const updateMovie = async (req, res) => {
         release_date,
         popularity,
         age_rating,
-        poster_url,
-        poster_public_id,
-        backdrop_url,
-        backdrop_public_id,
+        poster_image: posterImage,
         trailer_key,
         runtime,
       })
@@ -148,7 +153,7 @@ const deleteMovie = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const movie = await db.delete().from("movies").where("id", id);
+    await db.delete().from("movies").where("id", id);
 
     res.json({
       message: "Delete movie successfully",

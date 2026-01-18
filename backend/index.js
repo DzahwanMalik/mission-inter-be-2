@@ -13,6 +13,8 @@ const PORT = process.env.PORT;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Static Folder
+app.use("/public", express.static("public"));
 
 // API Routes
 app.use(moviesRouter);
