@@ -1,8 +1,26 @@
 import { db } from "../config/database.js";
 
 const getMovies = async (req, res) => {
+  const { search, popular, newRelease } = req.query;
+
   try {
-    const movies = await db.select().from("movies");
+    const query = db("movies").select();
+
+    if (search) {
+      query
+        .whereILike("title", `%${search}%`)
+        .orWhereILike("description", `%${search}%`);
+    }
+
+    if (popular === "true") {
+      query.orderBy("popularity", "desc").limit(3);
+    }
+
+    if (newRelease === "true") {
+      query.orderBy("release_date", "desc").limit(3);
+    }
+
+    const movies = await query;
 
     res.json({
       result: movies,

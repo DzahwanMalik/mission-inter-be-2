@@ -11,9 +11,9 @@ import { verifyToken } from "../middleware/auth.js";
 const moviesRouter = express.Router();
 
 moviesRouter.get("/movies", verifyToken, getMovies);
-moviesRouter.get("/movies/:id", verifyToken, getMovieById);
-moviesRouter.post("/movies", verifyToken, createMovie);
-moviesRouter.patch("/movies/:id", verifyToken, updateMovie);
-moviesRouter.delete("/movies/:id", verifyToken, deleteMovie);
+moviesRouter.get("/movies/:id", getMovieById);
+moviesRouter.post("/movies", createMovie);
+moviesRouter.patch("/movies/:id", updateMovie);
+moviesRouter.delete("/movies/:id", deleteMovie);
 
 export default moviesRouter;
